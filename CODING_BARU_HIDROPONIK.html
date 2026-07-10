@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HidroponikPedia.Id — Komunitas Edukasi Hidroponik</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    ::selection { background: #e7e5e4; color: #1c1917; }
+    body { font-family: 'Inter', sans-serif; }
+    
+    /* Opening Screen */
+    #opening-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #1c1917;
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #opening-screen.hide {
+      opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    #opening-screen .logo-icon {
+      width: 80px; height: 80px;
+      animation: pulse-scale 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-scale {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+    #opening-screen .brand-text {
+      margin-top: 24px;
+      font-size: 1.5rem; font-weight: 600; color: #fafaf9;
+      letter-spacing: -0.025em;
+      opacity: 0; animation: fade-up 0.8s ease 0.3s forwards;
+    }
+    #opening-screen .sub-text {
+      margin-top: 8px;
+      font-size: 0.875rem; color: #a8a29e;
+      opacity: 0; animation: fade-up 0.8s ease 0.6s forwards;
+    }
+    #opening-screen .loader-bar {
+      margin-top: 32px; width: 120px; height: 2px;
+      background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;
+      opacity: 0; animation: fade-up 0.8s ease 0.8s forwards;
+    }
+    #opening-screen .loader-bar-inner {
+      width: 0%; height: 100%; background: #22c55e; border-radius: 2px;
+      animation: load-bar 2s ease 0.9s forwards;
+    }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes load-bar {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    /* Scroll animations */
+    .fade-in-section {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-in-section.visible {
+      opacity: 1; transform: translateY(0);
+    }
+
+    /* Video Modal */
+    #video-modal {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,0.85);
+      display: none; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    #video-modal.active { display: flex; }
+    #video-modal .modal-content {
+      width: 100%; max-width: 900px;
+      position: relative;
+    }
+    #video-modal iframe {
+      width: 100%; aspect-ratio: 16/9; border: none; border-radius: 12px;
+    }
+
+    /* Article Modal */
+    #article-modal {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0,0,0,0.6);
+      display: none; align-items: flex-start; justify-content: center;
+      padding: 24px 16px; overflow-y: auto;
+    }
+    #article-modal.active { display: flex; }
+
+    /* FAQ */
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease; }
+    .faq-answer.open { max-height: 500px; }
+    .faq-chevron { transition: transform 0.3s ease; }
+    .faq-chevron.rotated { transform: rotate(180deg); }
+
+    /* Mobile menu */
+    #mobile-menu {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+    #mobile-menu.open { max-height: 400px; }
+
+    /* Custom scrollbar for article modal */
+    #article-modal::-webkit-scrollbar { width: 6px; }
+    #article-modal::-webkit-scrollbar-track { background: transparent; }
+    #article-modal::-webkit-scrollbar-thumb { background: #a8a29e; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-stone-50 text-stone-800 antialiased">
+
+  <!-- ===== OPENING SCREEN ===== -->
+  <div id="opening-screen">
+    <svg class="logo-icon" viewBox="0 0 48 48" fill="none">
+      <path d="M24 4C24 4 12 14 12 24C12 30.627 17.373 36 24 36C30.627 36 36 30.627 36 24C36 14 24 4 24 4Z" fill="#22c55e" opacity="0.2"/>
+      <path d="M24 10C24 10 16 17 16 24C16 28.418 19.582 32 24 32C28.418 32 32 28.418 32 24C32 17 24 10 24 10Z" fill="#22c55e" opacity="0.4"/>
+      <path d="M24 16C24 16 20 20 20 24C20 26.209 21.791 28 24 28C26.209 28 28 26.209 28 24C28 20 24 16 24 16Z" fill="#22c55e"/>
+      <line x1="24" y1="36" x2="24" y2="44" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+      <path d="M20 44H28" stroke="#22c55e" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div class="brand-text">HidroponikPedia.Id</div>
+    <div class="sub-text">Komunitas Edukasi Hidroponik</div>
+    <div class="loader-bar"><div class="loader-bar-inner"></div></div>
+  </div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-stone-50/80 backdrop-blur-md border-b border-stone-200/50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#beranda" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+          <i data-lucide="droplets" class="w-4 h-4 text-white"></i>
+        </div>
+        <span class="font-semibold text-stone-900 text-sm tracking-tight">HidroponikPedia.Id</span>
+      </a>
+
+      <!-- Desktop Menu -->
+      <div class="hidden lg:flex items-center gap-8">
+        <a href="#beranda" class="text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors duration-150">Beranda</a>
+        <a href="#video-edukasi" class="text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors duration-150">Video Edukasi</a>
+        <a href="#artikel" class="text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors duration-150">Artikel</a>
+        <a href="#jenis-sistem" class="text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors duration-150">Jenis Sistem</a>
+        <a href="#tentang-kami" class="text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors duration-150">Tentang Kami</a>
+        <a href="#faq" class="text-sm font-medium text-stone-500 hover:text-stone-900 transition-colors duration-150">FAQ</a>
+      </div>
+
+      <!-- Desktop Auth Area -->
+      <div class="hidden lg:flex items-center gap-3">
+        <button id="btn-login-desktop" onclick="openAuthModal('login')" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors duration-150">Masuk</button>
+        <button id="btn-register-desktop" onclick="openAuthModal('register')" class="inline-flex items-center gap-1.5 px-4 py-2 bg-stone-900 text-stone-50 text-sm font-medium rounded-full hover:bg-stone-800 transition-all duration-150">
+          Daftar
+        </button>
+        <!-- Logged-in user menu -->
+        <div id="user-menu-desktop" class="hidden relative">
+          <button onclick="toggleUserDropdown()" class="flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full border border-stone-200 hover:bg-stone-100 transition-colors">
+            <div id="user-avatar-desktop" class="w-7 h-7 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-semibold">A</div>
+            <span id="user-name-desktop" class="text-sm font-medium text-stone-700">Anggota</span>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-stone-400"></i>
+          </button>
+          <div id="user-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-xl border border-stone-200/70 shadow-lg py-2">
+            <a href="#beranda-anggota" onclick="closeUserDropdown()" class="flex items-center gap-2 px-4 py-2 text-sm text-stone-600 hover:bg-stone-50 transition-colors">
+              <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Beranda Saya
+            </a>
+            <button onclick="logout()" class="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-red-500 hover:bg-stone-50 transition-colors">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Keluar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button id="hamburger-btn" class="lg:hidden p-2 rounded-lg hover:bg-stone-100 transition-colors" aria-label="Menu">
+        <i data-lucide="menu" class="w-5 h-5 text-stone-700" id="hamburger-icon"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="lg:hidden bg-stone-50/95 backdrop-blur-md border-t border-stone-200/50">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-3">
+        <a href="#beranda" class="mobile-link text-sm font-medium text-stone-600 hover:text-stone-900 py-2 transition-colors">Beranda</a>
+        <a href="#video-edukasi" class="mobile-link text-sm font-medium text-stone-600 hover:text-stone-900 py-2 transition-colors">Video Edukasi</a>
+        <a href="#artikel" class="mobile-link text-sm font-medium text-stone-600 hover:text-stone-900 py-2 transition-colors">Artikel</a>
+        <a href="#jenis-sistem" class="mobile-link text-sm font-medium text-stone-600 hover:text-stone-900 py-2 transition-colors">Jenis Sistem</a>
+        <a href="#tentang-kami" class="mobile-link text-sm font-medium text-stone-600 hover:text-stone-900 py-2 transition-colors">Tentang Kami</a>
+        <a href="#faq" class="mobile-link text-sm font-medium text-stone-600 hover:text-stone-900 py-2 transition-colors">FAQ</a>
+
+        <div class="mt-2 pt-3 border-t border-stone-200/70 flex flex-col gap-2">
+          <button id="btn-login-mobile" onclick="openAuthModal('login')" class="w-full py-2.5 text-sm font-medium text-stone-700 border border-stone-300 rounded-full hover:bg-stone-100 transition-colors">Masuk</button>
+          <button id="btn-register-mobile" onclick="openAuthModal('register')" class="w-full py-2.5 text-sm font-medium text-white bg-stone-900 rounded-full hover:bg-stone-800 transition-colors">Daftar</button>
+
+          <div id="user-menu-mobile" class="hidden flex-col gap-2">
+            <div class="flex items-center gap-3 px-1 py-2">
+              <div id="user-avatar-mobile" class="w-9 h-9 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-semibold">A</div>
+              <div>
+                <div id="user-name-mobile" class="text-sm font-medium text-stone-900">Anggota</div>
+                <div id="user-email-mobile" class="text-xs text-stone-500">email@contoh.com</div>
+              </div>
+            </div>
+            <a href="#beranda-anggota" class="mobile-link w-full text-center py-2.5 text-sm font-medium text-stone-700 border border-stone-300 rounded-full hover:bg-stone-100 transition-colors">Beranda Saya</a>
+            <button onclick="logout()" class="w-full py-2.5 text-sm font-medium text-red-500 border border-red-200 rounded-full hover:bg-red-50 transition-colors">Keluar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== BERANDA ANGGOTA (Dashboard setelah Login) ===== -->
+  <section id="beranda-anggota" class="hidden pt-28 pb-20 bg-gradient-to-b from-green-50 to-stone-50 scroll-mt-16 border-b border-stone-200/70">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-12 fade-in-section">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
+            <i data-lucide="sparkles" class="w-3 h-3 text-green-600"></i>
+            <span class="text-xs font-medium text-green-700 tracking-wide">Beranda Anggota</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-medium text-stone-900 tracking-tight mb-2">Selamat datang, <span id="dashboard-user-name" class="text-green-600">Anggota</span> 👋</h2>
+          <p class="text-stone-500 max-w-xl">Senang kamu kembali! Lanjutkan perjalanan belajar hidroponikmu bersama komunitas HidroponikPedia.Id.</p>
+        </div>
+        <a href="#video-edukasi" class="inline-flex items-center gap-2 px-6 py-3 bg-stone-900 text-stone-50 text-sm font-medium rounded-full hover:bg-stone-800 transition-all duration-150 w-fit shadow-lg shadow-stone-900/10">
+          Lanjut Belajar <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid sm:grid-cols-3 gap-6 mb-12 fade-in-section">
+        <div class="bg-white rounded-2xl p-6 border border-stone-200/50">
+          <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center mb-4">
+            <i data-lucide="play-circle" class="w-5 h-5 text-green-600"></i>
+          </div>
+          <div class="text-2xl font-semibold text-stone-900">0</div>
+          <div class="text-xs text-stone-500 mt-1">Video Ditonton</div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 border border-stone-200/50">
+          <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center mb-4">
+            <i data-lucide="book-open" class="w-5 h-5 text-green-600"></i>
+          </div>
+          <div class="text-2xl font-semibold text-stone-900">0</div>
+          <div class="text-xs text-stone-500 mt-1">Artikel Dibaca</div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 border border-stone-200/50">
+          <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center mb-4">
+            <i data-lucide="calendar-check" class="w-5 h-5 text-green-600"></i>
+          </div>
+          <div class="text-2xl font-semibold text-stone-900" id="dashboard-join-date">Hari ini</div>
+          <div class="text-xs text-stone-500 mt-1">Bergabung Sejak</div>
+        </div>
+      </div>
+
+      <!-- Quick access -->
+      <h3 class="text-lg font-medium text-stone-900 mb-5 fade-in-section">Jelajahi Konten</h3>
+      <div class="grid sm:grid-cols-3 gap-6 fade-in-section">
+        <a href="#video-edukasi" class="group bg-white rounded-2xl p-6 border border-stone-200/50 hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300">
+          <div class="w-11 h-11 bg-green-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-500 transition-colors">
+            <i data-lucide="play" class="w-5 h-5 text-green-600 group-hover:text-white transition-colors"></i>
+          </div>
+          <h4 class="text-sm font-medium text-stone-900 mb-1">Video Edukasi</h4>
+          <p class="text-xs text-stone-500">Tonton tutorial hidroponik terbaru</p>
+        </a>
+        <a href="#artikel" class="group bg-white rounded-2xl p-6 border border-stone-200/50 hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300">
+          <div class="w-11 h-11 bg-green-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-500 transition-colors">
+            <i data-lucide="book-open" class="w-5 h-5 text-green-600 group-hover:text-white transition-colors"></i>
+          </div>
+          <h4 class="text-sm font-medium text-stone-900 mb-1">Artikel Edukasi</h4>
+          <p class="text-xs text-stone-500">Baca panduan lengkap budidaya</p>
+        </a>
+        <a href="#jenis-sistem" class="group bg-white rounded-2xl p-6 border border-stone-200/50 hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300">
+          <div class="w-11 h-11 bg-green-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-500 transition-colors">
+            <i data-lucide="layers" class="w-5 h-5 text-green-600 group-hover:text-white transition-colors"></i>
+          </div>
+          <h4 class="text-sm font-medium text-stone-900 mb-1">Jenis Sistem</h4>
+          <p class="text-xs text-stone-500">Kenali Wick, NFT, dan Drip System</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 1. BERANDA ===== -->
+  <section id="beranda" class="pt-32 pb-20 lg:pt-40 lg:pb-32 scroll-mt-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <!-- Text -->
+        <div class="fade-in-section">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+            <span class="text-xs font-medium text-green-700 tracking-wide">Komunitas Edukasi Hidroponik</span>
+          </div>
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-medium text-stone-900 leading-[1.1] tracking-tight mb-6">
+            Manfaatkan pertanian perkotaan<br>
+            <span class="text-green-500">Belajar Menanam</span> Untuk masa depan pertanian berkelanjutan
+          </h1>
+          <p class="text-lg text-stone-500 leading-relaxed mb-8 max-w-lg">
+            Sumber informasi seputar budidaya hidroponik. Siapapun dapat mulai menanam dengan pengetahuan yang tepat dan mudah dipahami.
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <a href="#artikel" class="inline-flex items-center gap-2 px-8 py-3.5 bg-stone-900 text-stone-50 text-sm font-medium rounded-full hover:bg-stone-800 transition-all duration-150 shadow-lg shadow-stone-900/10">
+              Mulai Belajar
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <a href="#video-edukasi" class="inline-flex items-center gap-2 px-8 py-3.5 border border-stone-300 text-stone-700 text-sm font-medium rounded-full hover:border-stone-400 hover:bg-stone-50 transition-all duration-150">
+              <i data-lucide="play-circle" class="w-4 h-4"></i>
+              Tonton Video
+            </a>
+          </div>
+
+          <!-- Stats -->
+          <div class="mt-12 flex gap-8 lg:gap-12">
+            <div>
+              <div class="text-2xl font-semibold text-stone-900">3+</div>
+              <div class="text-xs text-stone-500 mt-1">Artikel Edukasi</div>
+            </div>
+            <div>
+              <div class="text-2xl font-semibold text-stone-900">6+</div>
+              <div class="text-xs text-stone-500 mt-1">Video Tutorial</div>
+            </div>
+            <div>
+              <div class="text-2xl font-semibold text-stone-900">3</div>
+              <div class="text-xs text-stone-500 mt-1">Jenis Sistem</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image -->
+        <div class="fade-in-section relative">
+          <div class="relative rounded-2xl overflow-hidden shadow-2xl shadow-stone-200/50 aspect-[4/5] lg:aspect-[3/4]">
+            <img src="https://images.unsplash.com/photo-1682629088818-1ec55d0cf45b?fm=jpg&q=80&w=800&h=1000&auto=format&fit=crop" alt="Sistem hidroponik vertikal dengan tanaman hijau" class="w-full h-full object-cover hover:scale-105 transition-transform duration-700 ease-out">
+            <div class="absolute inset-0 bg-gradient-to-t from-stone-900/40 to-transparent"></div>
+            <div class="absolute bottom-6 left-6 right-6">
+              <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                    <i data-lucide="leaf" class="w-5 h-5 text-green-600"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-stone-900">Budidaya Tanpa Tanah</div>
+                    <div class="text-xs text-stone-500">Lebih bersih, lebih efisien</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Decorative -->
+          <div class="absolute -top-4 -right-4 w-24 h-24 bg-green-500/10 rounded-2xl -z-10"></div>
+          <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-stone-200/50 rounded-2xl -z-10"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 2. VIDEO EDUKASI ===== -->
+  <section id="video-edukasi" class="py-24 bg-white border-t border-stone-200/70 scroll-mt-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 fade-in-section">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
+          <i data-lucide="play" class="w-3 h-3 text-green-600"></i>
+          <span class="text-xs font-medium text-green-700 tracking-wide">Video Edukasi</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-medium text-stone-900 tracking-tight mb-4">Belajar Lewat Video</h2>
+        <p class="text-stone-500 max-w-2xl mx-auto">Kumpulan video tutorial hidroponik yang mudah diikuti, mulai dari pemula hingga tingkat lanjut.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Video 1 -->
+        <div class="fade-in-section group cursor-pointer" onclick="openVideo('3zV0HvGvH80', 'Apa itu Hidroponik?')">
+          <div class="relative rounded-2xl overflow-hidden aspect-video bg-stone-100 mb-4">
+            <img src="https://images.unsplash.com/photo-1518931169559-527a99b4074d?fm=jpg&q=80&w=600&h=340&auto=format&fit=crop" alt="Pengenalan dasar hidroponik" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+            <div class="absolute inset-0 bg-stone-900/20 group-hover:bg-stone-900/30 transition-colors flex items-center justify-center">
+              <div class="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="play" class="w-6 h-6 text-stone-900 ml-1"></i>
+              </div>
+            </div>
+            <div class="absolute top-3 right-3 px-2 py-1 bg-stone-900/70 backdrop-blur-sm rounded-md text-xs text-white font-medium">05:32</div>
+          </div>
+          <h3 class="text-base font-medium text-stone-900 group-hover:text-green-600 transition-colors mb-1">Apa itu sistem hidroponik?</h3>
+          <p class="text-sm text-stone-500">Memahami dasar-dasar hidroponik dan keuntungannya</p>
+        </div>
+
+        <!-- Video 2 -->
+        <div class="fade-in-section group cursor-pointer" onclick="openVideo('jK2UYbr0Fuc', 'Cara Membuat Sistem Wick Sederhana')">
+          <div class="relative rounded-2xl overflow-hidden aspect-video bg-stone-100 mb-4">
+            <img src="https://images.unsplash.com/photo-1592863690193-648fb871e554?fm=jpg&q=80&w=600&h=340&auto=format&fit=crop" alt="Sistem wick hidroponik sederhana" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+            <div class="absolute inset-0 bg-stone-900/20 group-hover:bg-stone-900/30 transition-colors flex items-center justify-center">
+              <div class="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="play" class="w-6 h-6 text-stone-900 ml-1"></i>
+              </div>
+            </div>
+            <div class="absolute top-3 right-3 px-2 py-1 bg-stone-900/70 backdrop-blur-sm rounded-md text-xs text-white font-medium">08:15</div>
+          </div>
+          <h3 class="text-base font-medium text-stone-900 group-hover:text-green-600 transition-colors mb-1">Cara Membuat Sistem Wick Sederhana</h3>
+          <p class="text-sm text-stone-500">Tutorial step-by-step membuat sistem wick dari bahan sederhana</p>
+        </div>
+
+        <!-- Video 3 -->
+        <div class="fade-in-section group cursor-pointer" onclick="openVideo('05aJQ6ZbzHM', 'Tutorial NFT dari Nol')">
+          <div class="relative rounded-2xl overflow-hidden aspect-video bg-stone-100 mb-4">
+            <img src="https://images.unsplash.com/photo-1682629088851-daa687df7f7f?fm=jpg&q=80&w=600&h=340&auto=format&fit=crop" alt="Tutorial sistem NFT hidroponik" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+            <div class="absolute inset-0 bg-stone-900/20 group-hover:bg-stone-900/30 transition-colors flex items-center justify-center">
+              <div class="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="play" class="w-6 h-6 text-stone-900 ml-1"></i>
+              </div>
+            </div>
+            <div class="absolute top-3 right-3 px-2 py-1 bg-stone-900/70 backdrop-blur-sm rounded-md text-xs text-white font-medium">12:47</div>
+          </div>
+          <h3 class="text-base font-medium text-stone-900 group-hover:text-green-600 transition-colors mb-1">Tutorial Membuat Instalasi Hidroponik NFT</h3>
+          <p class="text-sm text-stone-500">Panduan lengkap membangun sistem Nutrient Film Technique</p>
+        </div>
+
+        <!-- Video 4 -->
+        <div class="fade-in-section group cursor-pointer" onclick="openVideo('GQZDfTUmJoI', 'Cara Mengukur PPM Nutrisi')">
+          <div class="relative rounded-2xl overflow-hidden aspect-video bg-stone-100 mb-4">
+            <img src="https://images.unsplash.com/photo-1622210445956-ca3320a5e7c5?fm=jpg&q=80&w=600&h=340&auto=format&fit=crop" alt="Mengukur PPM larutan nutrisi hidroponik" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+            <div class="absolute inset-0 bg-stone-900/20 group-hover:bg-stone-900/30 transition-colors flex items-center justify-center">
+              <div class="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="play" class="w-6 h-6 text-stone-900 ml-1"></i>
+              </div>
+            </div>
+            <div class="absolute top-3 right-3 px-2 py-1 bg-stone-900/70 backdrop-blur-sm rounded-md text-xs text-white font-medium">06:20</div>
+          </div>
+          <h3 class="text-base font-medium text-stone-900 group-hover:text-green-600 transition-colors mb-1">Cara Mengukur PPM Nutrisi</h3>
+          <p class="text-sm text-stone-500">Panduan menggunakan TDS meter untuk mengukur konsentrasi nutrisi</p>
+        </div>
+
+        <!-- Video 5 -->
+        <div class="fade-in-section group cursor-pointer" onclick="openVideo('OgcFNbjIwAI', 'Inspirasi Sukses Petani Milenial')">
+          <div class="relative rounded-2xl overflow-hidden aspect-video bg-stone-100 mb-4">
+            <img src="https://images.unsplash.com/photo-1676409076828-7d0a7fb52aac?fm=jpg&q=80&w=600&h=340&auto=format&fit=crop" alt="Menanam selada secara hidroponik" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+            <div class="absolute inset-0 bg-stone-900/20 group-hover:bg-stone-900/30 transition-colors flex items-center justify-center">
+              <div class="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="play" class="w-6 h-6 text-stone-900 ml-1"></i>
+              </div>
+            </div>
+            <div class="absolute top-3 right-3 px-2 py-1 bg-stone-900/70 backdrop-blur-sm rounded-md text-xs text-white font-medium">09:55</div>
+          </div>
+          <h3 class="text-base font-medium text-stone-900 group-hover:text-green-600 transition-colors mb-1">Inspirasi Sukses Petani Milenial</h3>
+          <p class="text-sm text-stone-500"> Dia adalah William Perdana Santoso, meskipun baru 3 tahun menggeluti pertanian hidroponik, tapi berkat ketekunannya kini dia mampu membudidayakan selada hidroponik sendiri yang diberi nama Vale Farm Hidroponik dan berlokasi di Wonorejo, Gondangrejo, Kabupaten Karanganyar.</p>
+        </div>
+
+        <!-- Video 6 -->
+        <div class="fade-in-section group cursor-pointer" onclick="openVideo('Dz5M8fyd9FI', 'Mengatasi Hama & Penyakit')">
+          <div class="relative rounded-2xl overflow-hidden aspect-video bg-stone-100 mb-4">
+            <img src="https://images.unsplash.com/photo-1623600112168-186bb900c55f?fm=jpg&q=80&w=600&h=340&auto=format&fit=crop" alt="Perawatan tanaman hidroponik dari hama" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+            <div class="absolute inset-0 bg-stone-900/20 group-hover:bg-stone-900/30 transition-colors flex items-center justify-center">
+              <div class="w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <i data-lucide="play" class="w-6 h-6 text-stone-900 ml-1"></i>
+              </div>
+            </div>
+            <div class="absolute top-3 right-3 px-2 py-1 bg-stone-900/70 backdrop-blur-sm rounded-md text-xs text-white font-medium">07:38</div>
+          </div>
+          <h3 class="text-base font-medium text-stone-900 group-hover:text-green-600 transition-colors mb-1">Mengatasi Hama & Penyakit Pada Tanaman Hidroponik</h3>
+          <p class="text-sm text-stone-500">Tips mengatasi hama dan penyakit pada tanaman hidroponik</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Video Modal -->
+  <div id="video-modal" onclick="closeVideo(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button onclick="closeVideoDirect()" class="absolute -top-10 right-0 text-white/70 hover:text-white transition-colors">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+      <h3 id="video-modal-title" class="text-white font-medium text-lg mb-3"></h3>
+      <iframe id="video-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- ===== 3. ARTIKEL ===== -->
+  <section id="artikel" class="py-24 border-t border-stone-200/70 scroll-mt-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 fade-in-section">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
+          <i data-lucide="book-open" class="w-3 h-3 text-green-600"></i>
+          <span class="text-xs font-medium text-green-700 tracking-wide">Artikel Edukasi</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-medium text-stone-900 tracking-tight mb-4">Artikel Terpilih</h2>
+        <p class="text-stone-500 max-w-2xl mx-auto">Baca panduan lengkap budidaya hidroponik berdasarkan praktik terbaik dan referensi ilmiah.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Artikel 1 -->
+        <div class="fade-in-section group bg-white rounded-2xl border border-stone-200/50 overflow-hidden hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300 cursor-pointer" onclick="openArticle(0)">
+          <div class="aspect-[4/3] overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1697352711348-ed5143d1cfe6?fm=jpg&q=80&w=600&h=450&auto=format&fit=crop" alt="Menanam sawi dengan metode wick system" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2.5 py-1 bg-green-500/10 text-green-700 text-xs font-medium rounded-full">Wick System</span>
+              <span class="text-xs text-stone-400">5 min read</span>
+            </div>
+            <h3 class="text-lg font-medium text-stone-900 group-hover:text-green-600 transition-colors mb-2 leading-snug">Cara Menanam Tanaman Hidroponik Sawi Dengan Metode Wick Sistem</h3>
+            <p class="text-sm text-stone-500 leading-relaxed mb-4">Pelajari langkah-langkah menanam sawi menggunakan metode wick yang sederhana dan cocok untuk pemula...</p>
+            <span class="inline-flex items-center gap-1.5 text-sm font-medium text-stone-900 group-hover:text-green-600 transition-colors">
+              Baca Selengkapnya <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- Artikel 2 -->
+        <div class="fade-in-section group bg-white rounded-2xl border border-stone-200/50 overflow-hidden hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300 cursor-pointer" onclick="openArticle(1)">
+          <div class="aspect-[4/3] overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1676409085213-7ca1e07e6ab3?fm=jpg&q=80&w=600&h=450&auto=format&fit=crop" alt="Budidaya dengan metode NFT" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2.5 py-1 bg-green-500/10 text-green-700 text-xs font-medium rounded-full">NFT</span>
+              <span class="text-xs text-stone-400">7 min read</span>
+            </div>
+            <h3 class="text-lg font-medium text-stone-900 group-hover:text-green-600 transition-colors mb-2 leading-snug">Budidaya Hidroponik Dengan Metode NFT</h3>
+            <p class="text-sm text-stone-500 leading-relaxed mb-4">Panduan lengkap sistem Nutrient Film Technique untuk budidaya skala menengah hingga besar...</p>
+            <span class="inline-flex items-center gap-1.5 text-sm font-medium text-stone-900 group-hover:text-green-600 transition-colors">
+              Baca Selengkapnya <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- Artikel 3 -->
+        <div class="fade-in-section group bg-white rounded-2xl border border-stone-200/50 overflow-hidden hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300 cursor-pointer" onclick="openArticle(2)">
+          <div class="aspect-[4/3] overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1642433689275-5b369f1caf48?fm=jpg&q=80&w=600&h=450&auto=format&fit=crop" alt="Standar PPM nutrisi hidroponik" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2.5 py-1 bg-green-500/10 text-green-700 text-xs font-medium rounded-full">Nutrisi</span>
+              <span class="text-xs text-stone-400">6 min read</span>
+            </div>
+            <h3 class="text-lg font-medium text-stone-900 group-hover:text-green-600 transition-colors mb-2 leading-snug">Standar PPM yang Baik untuk Pertumbuhan Tanaman Hidroponik</h3>
+            <p class="text-sm text-stone-500 leading-relaxed mb-4">Ketahui standar PPM (Parts Per Million) yang optimal untuk berbagai jenis tanaman hidroponik...</p>
+            <span class="inline-flex items-center gap-1.5 text-sm font-medium text-stone-900 group-hover:text-green-600 transition-colors">
+              Baca Selengkapnya <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Article Modal -->
+  <div id="article-modal" onclick="closeArticle(event)">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-8 overflow-hidden" onclick="event.stopPropagation()">
+      <div id="article-modal-img" class="w-full aspect-[16/9] bg-stone-100 overflow-hidden">
+        <img id="article-modal-image" src="" alt="" class="w-full h-full object-cover">
+      </div>
+      <div class="p-6 md:p-10">
+        <div id="article-modal-badge" class="mb-3"></div>
+        <h2 id="article-modal-title" class="text-2xl md:text-3xl font-medium text-stone-900 tracking-tight mb-6"></h2>
+        <div id="article-modal-content" class="prose prose-stone max-w-none text-stone-600 leading-relaxed space-y-4"></div>
+        <div class="mt-8 pt-6 border-t border-stone-200">
+          <button onclick="closeArticleDirect()" class="inline-flex items-center gap-2 px-6 py-3 bg-stone-900 text-stone-50 text-sm font-medium rounded-full hover:bg-stone-800 transition-colors">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Kembali
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 4. JENIS SISTEM ===== -->
+  <section id="jenis-sistem" class="py-24 bg-white border-t border-stone-200/70 scroll-mt-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16 fade-in-section">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
+          <i data-lucide="layers" class="w-3 h-3 text-green-600"></i>
+          <span class="text-xs font-medium text-green-700 tracking-wide">Jenis Sistem</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-medium text-stone-900 tracking-tight mb-4">Jenis Sistem Hidroponik</h2>
+        <p class="text-stone-500 max-w-2xl mx-auto">Kenali berbagai metode budidaya hidroponik beserta kelebihan dan kekurangannya.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Wick -->
+        <div class="fade-in-section bg-stone-50 rounded-2xl p-8 border border-stone-200/50 hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300">
+          <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-5">
+            <i data-lucide="candlestick-chart" class="w-6 h-6 text-green-600"></i>
+          </div>
+          <h3 class="text-lg font-medium text-stone-900 mb-2">Wick System</h3>
+          <p class="text-sm text-stone-500 leading-relaxed mb-4">Sistem paling sederhana menggunakan sumbu (kain flanel/tali) untuk menyerap larutan nutrisi ke media tanam. Cocok untuk pemula.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 bg-white border border-stone-200 text-xs text-stone-600 rounded-full">Mudah</span>
+            <span class="px-2.5 py-1 bg-white border border-stone-200 text-xs text-stone-600 rounded-full">Murah</span>
+            <span class="px-2.5 py-1 bg-white border border-stone-200 text-xs text-stone-600 rounded-full">Pemula</span>
+          </div>
+        </div>
+
+        <!-- NFT -->
+        <div class="fade-in-section bg-stone-50 rounded-2xl p-8 border border-stone-200/50 hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300">
+          <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-5">
+            <i data-lucide="waves" class="w-6 h-6 text-green-600"></i>
+          </div>
+          <h3 class="text-lg font-medium text-stone-900 mb-2">NFT (Nutrient Film Technique)</h3>
+          <p class="text-sm text-stone-500 leading-relaxed mb-4">Larutan nutrisi dialirkan tipis dan terus-menerus melalui akar tanaman. Efisien untuk skala menengah hingga komersial.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 bg-white border border-stone-200 text-xs text-stone-600 rounded-full">Efisien</span>
+            <span class="px-2.5 py-1 bg-white border border-stone-200 text-xs text-stone-600 rounded-full">Komersial</span>
+            <span class="px-2.5 py-1 bg-white border border-stone-200 text-xs text-stone-600 rounded-full">Aktif</span>
+          </div>
+        </div>
+
+        <!-- Drip -->
+        <div class="fade-in-section bg-stone-50 rounded-2xl p-8 border border-stone-200/50 hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300">
+          <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-5">
+            <i data-lucide="droplet" class="w-6 h-6 text-green-600"></i>
+          </div>
+          <h3 class="text-lg font-medium text-stone-900 mb-2">Drip System</h3>
+          <p class="text-sm text-stone-500 leading-relaxed mb-4">Nutrisi diteteskan langsung ke zona akar melalui selang kecil. Sangat efisien penggunaan air dan nutrisinya.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 bg-white border border-stone-200 text-xs text-stone-600 rounded-full">Hemat Air</span>
+            <span class="px-2.5 py-1 bg-white border border-stone-200 text-xs text-stone-600 rounded-full">Presisi</span>
+            <span class="px-2.5 py-1 bg-white border border-stone-200 text-xs text-stone-600 rounded-full">Skala Besar</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 5. TENTANG KAMI ===== -->
+  <section id="tentang-kami" class="py-24 border-t border-stone-200/70 scroll-mt-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-16 items-start">
+        <!-- Narrative -->
+        <div class="fade-in-section">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
+            <i data-lucide="users" class="w-3 h-3 text-green-600"></i>
+            <span class="text-xs font-medium text-green-700 tracking-wide">Tentang Kami</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-medium text-stone-900 tracking-tight mb-6">Tentang HidroponikPedia.Id</h2>
+          <div class="space-y-4 text-stone-600 leading-relaxed">
+            <p>
+              Komunitas HidroponikPedia.Id adalah komunitas edukasi yang hadir untuk menjadi sumber informasi terpercaya seputar budidaya hidroponik. Kami percaya bahwa siapapun dapat mulai menanam secara hidroponik, baik di rumah, di sekolah, maupun skala usaha, dengan pengetahuan yang tepat dan mudah dipahami.
+            </p>
+            <p>
+              Melalui artikel, panduan, tutorial, serta berbagai konten edukatif, HidroponikPedia.Id berkomitmen untuk membantu masyarakat mempelajari hidroponik mulai dari dasar, teknik budidaya, perawatan tanaman, hingga proses panen berdasarkan praktik terbaik dan referensi ilmiah.
+            </p>
+            <p>
+              Visi kami adalah menciptakan generasi yang melek teknologi pertanian modern dan mampu memanfaatkan lahan terbatas untuk produksi pangan yang berkualitas, berkelanjutan, dan ramah lingkungan.
+            </p>
+          </div>
+
+          <!-- Values -->
+          <div class="mt-8 grid grid-cols-2 gap-4">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-stone-900">Edukasi Gratis</div>
+                <div class="text-xs text-stone-500">Semua konten dapat diakses gratis</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-stone-900">Terpercaya</div>
+                <div class="text-xs text-stone-500">Berdasarkan referensi ilmiah</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-stone-900">Mudah Dipahami</div>
+                <div class="text-xs text-stone-500">Bahasa sederhana dan jelas</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-stone-900">Berkelanjutan</div>
+                <div class="text-xs text-stone-500">Ramah lingkungan</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team -->
+        <div class="fade-in-section">
+          <h3 class="text-lg font-medium text-stone-900 mb-6">Tim Kami</h3>
+          <div class="space-y-5">
+            <!-- Person 1 -->
+            <div class="flex gap-4 p-5 bg-white rounded-2xl border border-stone-200/50 hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300">
+              <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-stone-100">
+                <img src="https://images.unsplash.com/photo-1761839257946-4616bcfafec7?fm=jpg&q=80&w=200&h=200&auto=format&fit=crop" alt="Masyayu Naila Larasati merawat tanaman hidroponik" class="w-full h-full object-cover">
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-base font-medium text-stone-900">Masyayu Naila Larasati</h4>
+                <div class="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 bg-green-500/10 rounded-full">
+                  <i data-lucide="shield-check" class="w-3 h-3 text-green-600"></i>
+                  <span class="text-xs font-medium text-green-700">Koordinasi Tim</span>
+                </div>
+                <p class="text-sm text-stone-500 mt-2 leading-relaxed">Bertanggung jawab mengkoordinasikan seluruh kegiatan komunitas, memastikan setiap program edukasi berjalan sesuai rencana.</p>
+              </div>
+            </div>
+
+            <!-- Person 2 -->
+            <div class="flex gap-4 p-5 bg-white rounded-2xl border border-stone-200/50 hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300">
+              <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-stone-100">
+                <img src="https://images.unsplash.com/photo-1615671524827-c1fe3973b648?fm=jpg&q=80&w=200&h=200&auto=format&fit=crop" alt="Leonora Fernandes Ximenes memegang tanaman hidroponik" class="w-full h-full object-cover">
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-base font-medium text-stone-900">Leonora Fernandes Ximenes</h4>
+                <div class="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 bg-blue-500/10 rounded-full">
+                  <i data-lucide="headphones" class="w-3 h-3 text-blue-600"></i>
+                  <span class="text-xs font-medium text-blue-700">Support Tim</span>
+                </div>
+                <p class="text-sm text-stone-500 mt-2 leading-relaxed">Memberikan dukungan teknis dan administratif, serta memastikan ketersediaan sumber daya untuk konten edukasi.</p>
+              </div>
+            </div>
+
+            <!-- Person 3 -->
+            <div class="flex gap-4 p-5 bg-white rounded-2xl border border-stone-200/50 hover:shadow-lg hover:shadow-stone-200/50 transition-all duration-300">
+              <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-stone-100">
+                <img src="https://images.unsplash.com/photo-1667509860948-46d20f127b43?fm=jpg&q=80&w=200&h=200&auto=format&fit=crop" alt="Fadillah Rahman Sungga memegang tanaman hidroponik" class="w-full h-full object-cover">
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-base font-medium text-stone-900">Fadillah Rahman Sungga</h4>
+                <div class="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 bg-amber-500/10 rounded-full">
+                  <i data-lucide="user" class="w-3 h-3 text-amber-600"></i>
+                  <span class="text-xs font-medium text-amber-700">Member Komunitas</span>
+                </div>
+                <p class="text-sm text-stone-500 mt-2 leading-relaxed">Berperan aktif dalam kegiatan komunitas, berkontribusi dalam penyusunan konten dan praktik budidaya di lapangan.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 6. FAQ ===== -->
+  <section id="faq" class="py-24 bg-white border-t border-stone-200/70 scroll-mt-16">
+    <div class="max-w-3xl mx-auto px-6">
+      <div class="text-center mb-16 fade-in-section">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
+          <i data-lucide="help-circle" class="w-3 h-3 text-green-600"></i>
+          <span class="text-xs font-medium text-green-700 tracking-wide">FAQ</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-medium text-stone-900 tracking-tight mb-4">Pertanyaan Umum</h2>
+        <p class="text-stone-500">Jawaban untuk pertanyaan yang sering diajukan seputar hidroponik.</p>
+      </div>
+
+      <div class="space-y-3 fade-in-section">
+        <!-- FAQ 1 -->
+        <div class="bg-stone-50 rounded-2xl border border-stone-200/50 overflow-hidden">
+          <button class="faq-btn w-full flex items-center justify-between p-5 text-left" onclick="toggleFaq(this)">
+            <span class="text-sm font-medium text-stone-900 pr-4">Apa itu hidroponik?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 faq-chevron flex-shrink-0"></i>
+          </button>
+          <div class="faq-answer px-5">
+            <p class="text-sm text-stone-500 leading-relaxed pb-5">Hidroponik adalah metode bercocok tanam tanpa menggunakan media tanah, melainkan menggunakan larutan nutrisi mineral dalam air. Tanaman mendapat nutrisi langsung dari larutan yang telah diformulasikan khusus, sehingga pertumbuhan lebih cepat dan hasil panen lebih optimal.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="bg-stone-50 rounded-2xl border border-stone-200/50 overflow-hidden">
+          <button class="faq-btn w-full flex items-center justify-between p-5 text-left" onclick="toggleFaq(this)">
+            <span class="text-sm font-medium text-stone-900 pr-4">Apakah hidroponik cocok untuk pemula?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 faq-chevron flex-shrink-0"></i>
+          </button>
+          <div class="faq-answer px-5">
+            <p class="text-sm text-stone-500 leading-relaxed pb-5">Sangat cocok! Metode seperti Wick System dirancang untuk pemula karena tidak memerlukan pompa atau peralatan listrik. Cukup dengan wadah, sumbu, media tanam, dan larutan nutrisi, Anda sudah bisa mulai menanam. HidroponikPedia.Id menyediakan panduan langkah demi langkah yang mudah diikuti.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="bg-stone-50 rounded-2xl border border-stone-200/50 overflow-hidden">
+          <button class="faq-btn w-full flex items-center justify-between p-5 text-left" onclick="toggleFaq(this)">
+            <span class="text-sm font-medium text-stone-900 pr-4">Tanaman apa saja yang bisa ditanam hidroponik?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 faq-chevron flex-shrink-0"></i>
+          </button>
+          <div class="faq-answer px-5">
+            <p class="text-sm text-stone-500 leading-relaxed pb-5">Banyak tanaman yang bisa ditanam hidroponik, antara lain: sayuran daun (selada, sawi, kangkung, bayam, pakcoy), sayuran buah (tomat, cabai, terong, paprika), herbal (basil, mint, oregano, seledri), dan bahkan buah-buahan seperti stroberi. Pemilihan tanaman disesuaikan dengan sistem hidroponik yang digunakan.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="bg-stone-50 rounded-2xl border border-stone-200/50 overflow-hidden">
+          <button class="faq-btn w-full flex items-center justify-between p-5 text-left" onclick="toggleFaq(this)">
+            <span class="text-sm font-medium text-stone-900 pr-4">Berapa biaya awal untuk memulai hidroponik?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 faq-chevron flex-shrink-0"></i>
+          </button>
+          <div class="faq-answer px-5">
+            <p class="text-sm text-stone-500 leading-relaxed pb-5">Biaya awal sangat bervariasi tergantung sistem yang dipilih. Untuk sistem Wick, biaya awal bisa mulai dari Rp 50.000 - Rp 150.000 untuk skala kecil (5-10 tanaman). Sistem NFT membutuhkan biaya lebih besar, sekitar Rp 500.000 - Rp 2.000.000 tergantung kapasitas. Nutrisi AB Mix per liter berkisar Rp 25.000 - Rp 40.000.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="bg-stone-50 rounded-2xl border border-stone-200/50 overflow-hidden">
+          <button class="faq-btn w-full flex items-center justify-between p-5 text-left" onclick="toggleFaq(this)">
+            <span class="text-sm font-medium text-stone-900 pr-4">Apa itu PPM dan mengapa penting?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 faq-chevron flex-shrink-0"></i>
+          </button>
+          <div class="faq-answer px-5">
+            <p class="text-sm text-stone-500 leading-relaxed pb-5">PPM (Parts Per Million) adalah satuan yang menunjukkan konsentrasi mineral terlarut dalam larutan nutrisi. PPM penting karena setiap tanaman membutuhkan konsentrasi nutrisi yang berbeda. PPM terlalu rendah menyebabkan tanaman kekurangan nutrisi, sedangkan PPM terlalu tinggi bisa membakar akar. Anda bisa mengukurnya dengan alat TDS meter.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 6 -->
+        <div class="bg-stone-50 rounded-2xl border border-stone-200/50 overflow-hidden">
+          <button class="faq-btn w-full flex items-center justify-between p-5 text-left" onclick="toggleFaq(this)">
+            <span class="text-sm font-medium text-stone-900 pr-4">Bagaimana cara bergabung dengan komunitas ini?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 faq-chevron flex-shrink-0"></i>
+          </button>
+          <div class="faq-answer px-5">
+            <p class="text-sm text-stone-500 leading-relaxed pb-5">Anda bisa bergabung dengan komunitas HidroponikPedia.Id melalui media sosial kami. Cukup ikuti akun kami, baca konten-konten edukasi yang tersedia, dan jangan ragu untuk bertanya melalui kolom komentar atau direct message. Komunitas kami terbuka untuk siapapun yang ingin belajar hidroponik!</p>
+          </div>
+        </div>
+
+        <!-- FAQ 7 -->
+        <div class="bg-stone-50 rounded-2xl border border-stone-200/50 overflow-hidden">
+          <button class="faq-btn w-full flex items-center justify-between p-5 text-left" onclick="toggleFaq(this)">
+            <span class="text-sm font-medium text-stone-900 pr-4">Apakah konten di HidroponikPedia.Id gratis?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 faq-chevron flex-shrink-0"></i>
+          </button>
+          <div class="faq-answer px-5">
+            <p class="text-sm text-stone-500 leading-relaxed pb-5">Ya, seluruh konten edukasi di HidroponikPedia.Id sepenuhnya gratis dan dapat diakses oleh siapapun. Kami berkomitmen untuk menyebarkan pengetahuan hidroponik seluas-luasnya agar masyarakat dapat memanfaatkan teknologi ini untuk kehidupan yang lebih baik.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="bg-stone-900 text-stone-400 py-16">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+        <!-- Brand -->
+        <div class="lg:col-span-2">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <i data-lucide="droplets" class="w-4 h-4 text-white"></i>
+            </div>
+            <span class="font-semibold text-stone-50 text-sm tracking-tight">HidroponikPedia.Id</span>
+          </div>
+          <p class="text-sm leading-relaxed max-w-sm mb-6">Komunitas edukasi hidroponik yang hadir sebagai sumber informasi terpercaya untuk membantu masyarakat belajar hidroponik dari dasar hingga mahir.</p>
+          <div class="flex gap-3">
+            <a href="#" class="w-9 h-9 bg-stone-800 hover:bg-stone-700 rounded-lg flex items-center justify-center transition-colors">
+              <i data-lucide="instagram" class="w-4 h-4 text-stone-400"></i>
+            </a>
+            <a href="#" class="w-9 h-9 bg-stone-800 hover:bg-stone-700 rounded-lg flex items-center justify-center transition-colors">
+              <i data-lucide="youtube" class="w-4 h-4 text-stone-400"></i>
+            </a>
+            <a href="#" class="w-9 h-9 bg-stone-800 hover:bg-stone-700 rounded-lg flex items-center justify-center transition-colors">
+              <i data-lucide="facebook" class="w-4 h-4 text-stone-400"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-sm font-semibold text-stone-50 mb-4">Navigasi</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#beranda" class="text-sm hover:text-stone-50 transition-colors">Beranda</a></li>
+            <li><a href="#video-edukasi" class="text-sm hover:text-stone-50 transition-colors">Video Edukasi</a></li>
+            <li><a href="#artikel" class="text-sm hover:text-stone-50 transition-colors">Artikel</a></li>
+            <li><a href="#jenis-sistem" class="text-sm hover:text-stone-50 transition-colors">Jenis Sistem</a></li>
+            <li><a href="#tentang-kami" class="text-sm hover:text-stone-50 transition-colors">Tentang Kami</a></li>
+            <li><a href="#faq" class="text-sm hover:text-stone-50 transition-colors">FAQ</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <h4 class="text-sm font-semibold text-stone-50 mb-4">Kontak</h4>
+          <ul class="space-y-2.5">
+            <li class="flex items-center gap-2 text-sm">
+              <i data-lucide="mail" class="w-4 h-4 text-stone-500"></i>
+              info@hidroponikpedia.id
+            </li>
+            <li class="flex items-center gap-2 text-sm">
+              <i data-lucide="map-pin" class="w-4 h-4 text-stone-500"></i>
+              Indonesia
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-stone-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-stone-500">&copy; 2025 HidroponikPedia.Id. Semua hak dilindungi.</p>
+        <p class="text-xs text-stone-600">Komunitas Edukasi Hidroponik Indonesia</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== AUTH MODAL (Masuk / Daftar) ===== -->
+  <div id="auth-modal" class="fixed inset-0 z-[110] bg-black/60 hidden items-center justify-center px-4" onclick="closeAuthModal(event)">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+      <div class="p-6 md:p-8">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+              <i data-lucide="droplets" class="w-4 h-4 text-white"></i>
+            </div>
+            <span class="font-semibold text-stone-900 text-sm">HidroponikPedia.Id</span>
+          </div>
+          <button onclick="closeAuthModal()" class="text-stone-400 hover:text-stone-700 transition-colors">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="login-form-wrap">
+          <h2 class="text-xl font-medium text-stone-900 mb-1">Masuk ke Akun</h2>
+          <p class="text-sm text-stone-500 mb-6">Yuk lanjutkan belajar hidroponik bersama komunitas.</p>
+          <form onsubmit="handleLogin(event)" class="space-y-4">
+            <div>
+              <label class="text-xs font-medium text-stone-600 mb-1 block">Email</label>
+              <input type="email" id="login-email" required class="w-full px-4 py-2.5 rounded-lg border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500" placeholder="nama@email.com">
+            </div>
+            <div>
+              <label class="text-xs font-medium text-stone-600 mb-1 block">Kata Sandi</label>
+              <input type="password" id="login-password" required minlength="6" class="w-full px-4 py-2.5 rounded-lg border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500" placeholder="Minimal 6 karakter">
+            </div>
+            <p id="login-error" class="text-xs text-red-500 hidden"></p>
+            <button type="submit" class="w-full py-3 bg-stone-900 text-stone-50 text-sm font-medium rounded-full hover:bg-stone-800 transition-colors">Masuk</button>
+          </form>
+          <p class="text-xs text-stone-400 text-center mt-4">Contoh akun demo: demo@hidroponikpedia.id / demo123</p>
+          <p class="text-sm text-stone-500 text-center mt-5">Belum punya akun? <button onclick="switchAuthMode('register')" class="text-green-600 font-medium hover:underline">Daftar sekarang</button></p>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="register-form-wrap" class="hidden">
+          <h2 class="text-xl font-medium text-stone-900 mb-1">Bergabung dengan Komunitas</h2>
+          <p class="text-sm text-stone-500 mb-6">Daftar gratis dan mulai perjalanan belajar hidroponikmu.</p>
+          <form onsubmit="handleRegister(event)" class="space-y-4">
+            <div>
+              <label class="text-xs font-medium text-stone-600 mb-1 block">Nama Lengkap</label>
+              <input type="text" id="register-name" required class="w-full px-4 py-2.5 rounded-lg border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500" placeholder="Nama kamu">
+            </div>
+            <div>
+              <label class="text-xs font-medium text-stone-600 mb-1 block">Email</label>
+              <input type="email" id="register-email" required class="w-full px-4 py-2.5 rounded-lg border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500" placeholder="nama@email.com">
+            </div>
+            <div>
+              <label class="text-xs font-medium text-stone-600 mb-1 block">Kata Sandi</label>
+              <input type="password" id="register-password" required minlength="6" class="w-full px-4 py-2.5 rounded-lg border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500" placeholder="Minimal 6 karakter">
+            </div>
+            <div>
+              <label class="text-xs font-medium text-stone-600 mb-1 block">Konfirmasi Kata Sandi</label>
+              <input type="password" id="register-confirm" required minlength="6" class="w-full px-4 py-2.5 rounded-lg border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-500" placeholder="Ulangi kata sandi">
+            </div>
+            <p id="register-error" class="text-xs text-red-500 hidden"></p>
+            <button type="submit" class="w-full py-3 bg-green-500 text-white text-sm font-medium rounded-full hover:bg-green-600 transition-colors">Daftar</button>
+          </form>
+          <p class="text-sm text-stone-500 text-center mt-5">Sudah punya akun? <button onclick="switchAuthMode('login')" class="text-green-600 font-medium hover:underline">Masuk di sini</button></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Back to Top Button ===== -->
+  <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-6 right-6 z-50 w-11 h-11 bg-stone-900 text-white rounded-full flex items-center justify-center shadow-lg shadow-stone-900/20 hover:bg-stone-800 transition-all duration-300 opacity-0 translate-y-4 pointer-events-none">
+    <i data-lucide="chevron-up" class="w-5 h-5"></i>
+  </button>
+
+  <script>
+    // ===== Initialize Lucide Icons =====
+    lucide.createIcons();
+
+    // ===== Opening Screen =====
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('opening-screen').classList.add('hide');
+        document.body.style.overflow = '';
+      }, 3200);
+    });
+    document.body.style.overflow = 'hidden'; // Prevent scroll during opening
+
+    // ===== Mobile Menu =====
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    let menuOpen = false;
+
+    hamburgerBtn.addEventListener('click', () => {
+      menuOpen = !menuOpen;
+      mobileMenu.classList.toggle('open', menuOpen);
+      // Swap icon
+      const icon = hamburgerBtn.querySelector('i');
+      icon.setAttribute('data-lucide', menuOpen ? 'x' : 'menu');
+      lucide.createIcons();
+    });
+
+    // Close mobile menu on link click
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        menuOpen = false;
+        mobileMenu.classList.remove('open');
+        const icon = hamburgerBtn.querySelector('i');
+        icon.setAttribute('data-lucide', 'menu');
+        lucide.createIcons();
+      });
+    });
+
+    // ===== Navbar scroll effect =====
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('shadow-sm');
+      } else {
+        navbar.classList.remove('shadow-sm');
+      }
+    });
+
+    // ===== Back to Top Button =====
+    const backToTop = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 600) {
+        backToTop.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+        backToTop.classList.add('opacity-100', 'translate-y-0');
+      } else {
+        backToTop.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+        backToTop.classList.remove('opacity-100', 'translate-y-0');
+      }
+    });
+
+    // ===== Scroll Animations =====
+    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
+
+    // ===== Video Modal =====
+    function openVideo(videoId, title) {
+      const modal = document.getElementById('video-modal');
+      const iframe = document.getElementById('video-iframe');
+      const titleEl = document.getElementById('video-modal-title');
+      
+      titleEl.textContent = title;
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeVideo(event) {
+      if (event.target === document.getElementById('video-modal')) {
+        closeVideoDirect();
+      }
+    }
+
+    function closeVideoDirect() {
+      const modal = document.getElementById('video-modal');
+      const iframe = document.getElementById('video-iframe');
+      iframe.src = '';
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // ===== Article Data & Modal =====
+    const articles = [
+      {
+        title: 'Cara Menanam Tanaman Hidroponik Sawi Dengan Metode Wick Sistem',
+        badge: 'Wick System',
+        image: 'https://images.unsplash.com/photo-1697352711348-ed5143d1cfe6?fm=jpg&q=80&w=900&h=500&auto=format&fit=crop',
+        content: `
+          <p>Metode Wick System adalah salah satu teknik hidroponik paling sederhana yang sangat cocok untuk pemula. Sistem ini bekerja menggunakan prinsip kapilaritas, di mana sumbu (kain flanel) menyerap larutan nutrisi dari wadah ke media tanam secara otomatis.</p>
+          
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Alat dan Bahan yang Dibutuhkan</h3>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Wadah pelarut dan penampung nutrisi (Botol Plastik)</li>
+            <li>Media tanam (bak plastik,Penutup berlubang & netpot)</li>
+            <li>Sumbu (kain flanel 2cm x 15cm)</li>
+            <li>Media tanam (rockwool/spons)</li>
+            <li>Nutrisi AB Mix hidroponik</li>
+            <li>Benih jenis sayuran daun (sawi,bayanm,kangkung,selada,dll)</li>
+            <li>TDS meter & Ph meter (EC)</li>
+          </ul>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Langkah-Langkah Penanaman</h3>
+          <p><strong>1. Persiapan Benih:</strong> Siapkan benih dengan jenis sayuran daun (bayam,sawi,kangkung,selada,dll). Semai benih pada rockwool/spons yang sudah dibasahi dengan air. Setelah itu letakkan di tempat teduh, atau bisa juga di bawah naungan.</p>
+          <p><strong>2. Persiapan Sistem:</strong> Siapkan netpot. Masukkan sumbu flanel ke dalam netpot sebagai media tanam, pastikan ujung bawah sumbu menjuntai ke dalam larutan nutrisi (minimal tercelup 3-5 cm).</p>
+          <p><strong>3. Pindah Tanam:</strong> Setelah bibit memiliki 3-4 daun sejati (sekitar umur 10-14 hari), pindahkan bibit ke dalam netpot. Pastikan akar bibit menyentuh sumbu.</p>
+          <p><strong>4. Pemberian Nutrisi:</strong> Larutkan nutrisi AB Mix dengan air dengan takaran 1:1 (gunakan botol untuk melarutkan pupuk).Kemudian larutan nutrisi tersebut siap digunakan.Tambahkan media air dengan larutan nutrisi, ukur dan sesuaikan EC/Ph (Ph optimal 5,5-6,5).</p>
+          <p><strong>5. Perawatan:</strong> Pastikan kandungan nutrisi di media air selalu tersedia. Tambahkan nutrisi setiap 3-5 hari (Jika ppm/ph masih optimal tidak perlu ditambahkan). Cek secara berkala agar tanaman mendapat cahaya matahari (minimal 4-6 jam per hari), nutrisi, air yang tercukupi.</p>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Waktu Panen</h3>
+          <p>Sawi hidroponik dengan metode wick biasanya siap panen dalam 25-35 hari setelah semai. Ciri sawi siap panen adalah daun sudah lebar, tebal, dan berwarna hijau cerah. Panen dengan memotong pangkal batang menggunakan gunting tajam. jika mau panen seakarnya juga bisa (Untuk dijual).</p>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Tips Sukses</h3>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Gunakan sumbu yang cukup panjang agar penyerapan nutrisi optimal</li>
+            <li>Jangan biarkan media air dalam bak kering, selalu cek setiap hari</li>
+            <li>Jaga kebersihan sistem dari lumut atau alga</li>
+            <li>Sesuaikan konsentrasi nutrisi berdasarkan fase pertumbuhan</li>
+          </ul>
+        `
+      },
+      {
+        title: 'Budidaya Hidroponik Dengan Metode NFT',
+        badge: 'NFT',
+        image: 'https://images.unsplash.com/photo-1676409085213-7ca1e07e6ab3?fm=jpg&q=80&w=900&h=500&auto=format&fit=crop',
+        content: `
+          <p>Nutrient Film Technique (NFT) adalah metode hidroponik di mana larutan nutrisi dialirkan secara tipis (seperti film) dan terus-menerus melewati akar tanaman. Sistem ini banyak digunakan untuk skala komersial karena efisiensi nutrisi dan air yang tinggi.</p>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Prinsip Kerja NFT</h3>
+          <p>Pompa air mengalirkan larutan nutrisi dari reservoir ke saluran instalasi yang sedikit miring (kemiringan 1-3%). Larutan mengalir tipis (ketebalan 1-3mm) di bawah akar tanaman. Akar menyerap nutrisi saat larutan melewatinya, lalu larutan kembali ke reservoir melalui perputaran air antara tandon dan instalasi. Ini menciptakan siklus sirkulasi secara terus-menerus.</p>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Komponen Utama Sistem NFT</h3>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><strong>Reservoir:</strong> Wadah penampung larutan nutrisi (minimal 50 liter)</li>
+            <li><strong>Pompa air:</strong> Submersible pump 18-25W</li>
+            <li><strong>Pipa saluran (gully):</strong> Pipa PVC 3 inch atau gully khusus NFT</li>
+            <li><strong>Netpot:</strong> Ukuran 5cm untuk sayuran daun</li>
+            <li><strong>Distribusi pipa:</strong> Selang dan fitting untuk mengalirkan nutrisi</li>
+            <li><strong>Timer (opsional):</strong> Untuk mengatur siklus on/off pompa</li>
+          </ul>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Instalasi Sistem</h3>
+          <p><strong>1. Rancang Tata Letak:</strong> Tentukan panjang gully (maksimal 6-8 meter per jalur untuk menjaga distribusi nutrisi merata). Buat kemiringan 1-3% dari ujung masuk ke ujung keluar.</p>
+          <p><strong>2. Pasang Pipa Distribusi:</strong> Hubungkan pompa ke pipa utama, lalu buat cabang ke masing-masing gully. Gunakan valve untuk mengatur debit air per gully.</p>
+          <p><strong>3. Buat Lubang Tanam:</strong> Buat lubang pada gully dengan jarak 15-20cm untuk sayuran daun. Pastikan lubang sejajar agar nutrisi terdistribusi merata.</p>
+          <p><strong>4. Uji Coba Aliran:</strong> Jalankan sistem tanpa tanaman terlebih dahulu. Pastikan aliran nutrisi tipis dan merata di seluruh gully. Tidak boleh ada genangan.</p>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Pengelolaan Nutrisi</h3>
+          <p>Untuk NFT, konsentrasi nutrisi biasanya lebih rendah dibanding sistem lain karena paparan akar yang kontinu. Gunakan PPM 560-840 untuk sayuran daun dan 1260-1540 untuk tomat/cabai. Cek EC dan pH setiap hari. Target pH 5.5-6.5.</p>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Kelebihan & Kekurangan</h3>
+          <p><strong>Kelebihan:</strong> Hemat nutrisi dan air, pertumbuhan cepat, cocok untuk skala komersial, mudah diotomasi.</p>
+          <p><strong>Kekurangan:</strong> Bergantung pada listrik (jika pompa mati, tanaman bisa cepat layu), memerlukan pemantauan rutin, tidak cocok untuk tanaman berakar besar.</p>
+        `
+      },
+      {
+        title: 'Standar PPM yang Baik untuk Pertumbuhan Tanaman Hidroponik',
+        badge: 'Nutrisi',
+        image: 'https://images.unsplash.com/photo-1642433689275-5b369f1caf48?fm=jpg&q=80&w=900&h=500&auto=format&fit=crop',
+        content: `
+          <p>PPM (Parts Per Million) adalah ukuran konsentrasi mineral terlarut dalam larutan nutrisi hidroponik. Memahami standar PPM yang tepat untuk setiap jenis tanaman adalah kunci keberhasilan budidaya hidroponik.</p>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Apa itu PPM dan TDS?</h3>
+          <p>PPM mengukur jumlah partikel mineral terlarut per juta partikel air. TDS (Total Dissolved Solids) adalah istilah yang sering digunakan secara bergantian dengan PPM. Alat yang digunakan disebut TDS meter atau EC meter. EC (Electrical Conductivity) mengukur kemampuan larutan menghantarkan listrik, yang berkorelasi dengan konsentrasi nutrisi.</p>
+          <p><strong>Konversi:</strong> EC 1.0 ≈ PPM 500 (skala 500) atau PPM 700 (skala 700). Pastikan konsisten dengan skala yang digunakan.</p>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Standar PPM Berdasarkan Jenis Tanaman</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border border-stone-200 rounded-lg overflow-hidden">
+              <thead class="bg-stone-100">
+                <tr>
+                  <th class="text-left p-3 font-medium text-stone-700">Tanaman</th>
+                  <th class="text-left p-3 font-medium text-stone-700">PPM (Skala 500)</th>
+                  <th class="text-left p-3 font-medium text-stone-700">EC (mS/cm)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100">
+                <tr><td class="p-3">Selada</td><td class="p-3">560 - 840</td><td class="p-3">1.1 - 1.7</td></tr>
+                <tr><td class="p-3">Sawi / Pakcoy</td><td class="p-3">560 - 840</td><td class="p-3">1.1 - 1.7</td></tr>
+                <tr><td class="p-3">Bayam</td><td class="p-3">840 - 1260</td><td class="p-3">1.7 - 2.5</td></tr>
+                <tr><td class="p-3">Kangkung</td><td class="p-3">560 - 840</td><td class="p-3">1.1 - 1.7</td></tr>
+                <tr><td class="p-3">Basil / Seledri</td><td class="p-3">700 - 1120</td><td class="p-3">1.4 - 2.2</td></tr>
+                <tr><td class="p-3">Tomat</td><td class="p-3">1260 - 1820</td><td class="p-3">2.5 - 3.6</td></tr>
+                <tr><td class="p-3">Cabai / Paprika</td><td class="p-3">1260 - 1540</td><td class="p-3">2.5 - 3.1</td></tr>
+                <tr><td class="p-3">Terong</td><td class="p-3">1120 - 1540</td><td class="p-3">2.2 - 3.1</td></tr>
+                <tr><td class="p-3">Stroberi</td><td class="p-3">840 - 1260</td><td class="p-3">1.7 - 2.5</td></tr>
+                <tr><td class="p-3">Melon</td><td class="p-3">1540 - 2100</td><td class="p-3">3.1 - 4.2</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">PPM Berdasarkan Fase Pertumbuhan</h3>
+          <p><strong>Fase Semai (0-14 hari):</strong> PPM 200-350. Bibit masih sensitif, gunakan nutrisi setengah dosis.</p>
+          <p><strong>Fase Vegetatif (15-30 hari):</strong> PPM 500-800. Tingkatkan secara bertahap seiring pertumbuhan daun.</p>
+          <p><strong>Fase Generatif/Buah (30+ hari):</strong> PPM 1000-1600. Tanaman membutuhkan nutrisi lebih tinggi untuk pembuahan.</p>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Tips Pengukuran PPM</h3>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Cek media tanam menggunakan TDS meter/Ph meter (EC) secara berkala (minimal sekali seminggu)</li>
+            <li>Ukur PPM sebelum dan sesudah pencampuran nutrisi</li>
+            <li>Cek PPM setiap hari, tambahkan nutrisi jika turun lebih dari ukuran PPM optimal</li>
+            <li>Jika PPM naik (karena tanaman lebih banyak menyerap air), tambahkan air murni</li>
+            <li>Ganti total larutan nutrisi setiap 1-2 minggu untuk menghindari ketidakseimbangan</li>
+            <li>Selalu ukur pH bersamaan dengan PPM (target pH 5.5-6.5)</li>
+          </ul>
+
+          <h3 class="text-lg font-semibold text-stone-900 mt-6 mb-3">Tanda-Tanda PPM Tidak Tepat</h3>
+          <p><strong>PPM Terlalu Rendah:</strong> Daun menguning (klorosis), pertumbuhan lambat, batang lemah, daun kecil.</p>
+          <p><strong>PPM Terlalu Tinggi:</strong> Ujung daun terbakar (tip burn), akar coklat/berwarna gelap, daun menggulung, pertumbuhan terhambat.</p>
+        `
+      }
+    ];
+
+    function openArticle(index) {
+      const article = articles[index];
+      const modal = document.getElementById('article-modal');
+      document.getElementById('article-modal-image').src = article.image;
+      document.getElementById('article-modal-title').textContent = article.title;
+      document.getElementById('article-modal-badge').innerHTML = `<span class="px-2.5 py-1 bg-green-500/10 text-green-700 text-xs font-medium rounded-full">${article.badge}</span>`;
+      document.getElementById('article-modal-content').innerHTML = article.content;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      modal.scrollTop = 0;
+    }
+
+    function closeArticle(event) {
+      if (event.target === document.getElementById('article-modal')) {
+        closeArticleDirect();
+      }
+    }
+
+    function closeArticleDirect() {
+      document.getElementById('article-modal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // ===== FAQ Accordion =====
+    function toggleFaq(btn) {
+      const answer = btn.nextElementSibling;
+      const chevron = btn.querySelector('.faq-chevron');
+      const isOpen = answer.classList.contains('open');
+
+      // Close all
+      document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
+      document.querySelectorAll('.faq-chevron').forEach(c => c.classList.remove('rotated'));
+
+      // Open clicked if was closed
+      if (!isOpen) {
+        answer.classList.add('open');
+        chevron.classList.add('rotated');
+      }
+    }
+
+    // ===== Auth (Masuk / Daftar) — Demo sisi-browser, tanpa server/database =====
+    // Catatan: data akun hanya tersimpan selama sesi/tab ini berjalan (di memori),
+    // akan hilang jika halaman di-refresh, karena web ini belum terhubung backend.
+    let registeredUsers = [
+      { name: 'Anggota Demo', email: 'demo@hidroponikpedia.id', password: 'demo123' }
+    ];
+    let currentUser = null;
+
+    function openAuthModal(mode) {
+      const modal = document.getElementById('auth-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      switchAuthMode(mode || 'login');
+    }
+
+    function closeAuthModal(event) {
+      if (event && event.target !== document.getElementById('auth-modal')) return;
+      const modal = document.getElementById('auth-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    function switchAuthMode(mode) {
+      const loginWrap = document.getElementById('login-form-wrap');
+      const registerWrap = document.getElementById('register-form-wrap');
+      document.getElementById('login-error').classList.add('hidden');
+      document.getElementById('register-error').classList.add('hidden');
+      if (mode === 'register') {
+        loginWrap.classList.add('hidden');
+        registerWrap.classList.remove('hidden');
+      } else {
+        registerWrap.classList.add('hidden');
+        loginWrap.classList.remove('hidden');
+      }
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+      const errorEl = document.getElementById('login-error');
+      const user = registeredUsers.find(u => u.email.toLowerCase() === email && u.password === password);
+      if (!user) {
+        errorEl.textContent = 'Email atau kata sandi salah. Coba lagi atau daftar akun baru.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+      event.target.reset();
+      loginSuccess(user);
+    }
+
+    function handleRegister(event) {
+      event.preventDefault();
+      const name = document.getElementById('register-name').value.trim();
+      const email = document.getElementById('register-email').value.trim().toLowerCase();
+      const password = document.getElementById('register-password').value;
+      const confirm = document.getElementById('register-confirm').value;
+      const errorEl = document.getElementById('register-error');
+
+      if (password !== confirm) {
+        errorEl.textContent = 'Konfirmasi kata sandi tidak cocok.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+      if (registeredUsers.some(u => u.email.toLowerCase() === email)) {
+        errorEl.textContent = 'Email ini sudah terdaftar. Silakan masuk.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+      const newUser = { name, email, password };
+      registeredUsers.push(newUser);
+      event.target.reset();
+      loginSuccess(newUser);
+    }
+
+    function loginSuccess(user) {
+      currentUser = user;
+      closeAuthModal();
+      updateAuthUI();
+      document.getElementById('beranda-anggota').classList.remove('hidden');
+      document.querySelectorAll('#beranda-anggota .fade-in-section').forEach(el => el.classList.add('visible'));
+      setTimeout(() => {
+        document.getElementById('beranda-anggota').scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    }
+
+    function logout() {
+      currentUser = null;
+      updateAuthUI();
+      document.getElementById('beranda-anggota').classList.add('hidden');
+      closeUserDropdown();
+      document.getElementById('beranda').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function updateAuthUI() {
+      const loggedIn = !!currentUser;
+      document.getElementById('btn-login-desktop').classList.toggle('hidden', loggedIn);
+      document.getElementById('btn-register-desktop').classList.toggle('hidden', loggedIn);
+      document.getElementById('user-menu-desktop').classList.toggle('hidden', !loggedIn);
+
+      document.getElementById('btn-login-mobile').classList.toggle('hidden', loggedIn);
+      document.getElementById('btn-register-mobile').classList.toggle('hidden', loggedIn);
+      document.getElementById('user-menu-mobile').classList.toggle('hidden', !loggedIn);
+      document.getElementById('user-menu-mobile').classList.toggle('flex', loggedIn);
+
+      if (loggedIn) {
+        const initial = currentUser.name.trim().charAt(0).toUpperCase() || 'A';
+        const firstName = currentUser.name.trim().split(' ')[0];
+        document.getElementById('user-avatar-desktop').textContent = initial;
+        document.getElementById('user-name-desktop').textContent = firstName;
+        document.getElementById('user-avatar-mobile').textContent = initial;
+        document.getElementById('user-name-mobile').textContent = currentUser.name;
+        document.getElementById('user-email-mobile').textContent = currentUser.email;
+        document.getElementById('dashboard-user-name').textContent = firstName;
+        document.getElementById('dashboard-join-date').textContent = 'Hari ini';
+      }
+    }
+
+    function toggleUserDropdown() {
+      document.getElementById('user-dropdown').classList.toggle('hidden');
+    }
+    function closeUserDropdown() {
+      document.getElementById('user-dropdown').classList.add('hidden');
+    }
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('user-menu-desktop');
+      if (menu && !menu.contains(e.target)) closeUserDropdown();
+    });
+
+    // ===== Close modals with Escape key =====
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeVideoDirect();
+        closeArticleDirect();
+        closeAuthModal({ target: document.getElementById('auth-modal') });
+      }
+    });
+  </script>
+</body>
+</html>
